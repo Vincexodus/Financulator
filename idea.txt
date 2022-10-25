@@ -1,0 +1,21 @@
+Calculator with basic financial konwledge
+
+Simple GUI with several tabs
+1. Monthly Expenses
+- ask abt monthly gross salary
+- ask abt expenses categories 
+- rent, loan, eat, additional 
+
+2. Expenses ratio 
+- 50/30/20
+- adjust accordingly
+
+3. Cashflow calculator 
+- upper sheet - income_tab) & expenses
+- lower sheet - asset & liabalities
+
+4. Savings calculator
+- ask amount of saving
+- user enter divided/web scrape
+- enter period of time
+- calculate total return after time

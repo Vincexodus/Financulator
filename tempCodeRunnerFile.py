@@ -1,0 +1,12 @@
+
+# income = data_filter(df['Income'].tolist())
+# income_val = data_filter(df.iloc[:, 1].tolist())
+# expenses = data_filter(df['Expenses'].tolist())
+# expenses_val = data_filter(df.iloc[:, 3].tolist())
+# report = data_filter(df['Monthly report'].tolist())
+# report_val = data_filter(df.iloc[:, 5].tolist())
+# asset = data_filter(df['Asset'].tolist())
+# asset_val = data_filter(df.iloc[:, 7].tolist())
+# liability = data_filter(df['Liability'].tolist())
+# liability_val = data_filter(df.iloc[:, 9].tolist())
+# networth = data_filter(df['Networth'].tolist())

@@ -1,25 +1,4 @@
-# Calculator with basic financial konwledge
-
-# Simple GUI with several tabs
-# 1. Monthly Expenses
-# - ask abt monthly gross salary
-# - ask abt expenses categories 
-# - rent, loan, eat, additional 
-
-# 2. Expenses ratio 
-# - 50/30/20
-# - adjust accordingly
-
-# 3. Cashflow calculator 
-# - upper sheet - income_tab) & expenses
-# - lower sheet - asset & liabalities
-
-# 4. Savings calculator
-# - ask amount of saving
-# - user enter divided/web scrape
-# - enter period of time
-# - calculate total return after time
-
+from textwrap import indent
 from tkinter import *
 from tkinter import ttk
 from matplotlib.figure import Figure
@@ -27,48 +6,53 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 import numpy as np
 
-# new window
+# gui window
 root = Tk()
 root.title("Financulator")
 root.geometry("800x800")
 tabControl = ttk.Notebook(root)
 
-# initiate tabs
+# initiate multiple tabs
 dashboard_tab = ttk.Frame(tabControl)
 income_tab = ttk.Frame(tabControl)
 expenses_tab = ttk.Frame(tabControl)
-
 tabControl.add(dashboard_tab, text ='Dashboard')
 tabControl.add(income_tab, text ='Income')
 tabControl.add(expenses_tab, text ='Expenses')
 tabControl.pack(expand = 1, fill ="both")
 
-# data
-df = pd.read_excel('database.xlsx')
-print(df)
-print()
+# import data from excel
+df = pd.ExcelFile('database.xlsx')
+month_index = df.sheet_names
 
+sheet_list = []
+for i in range(3):
+  df = pd.read_excel('database.xlsx', sheet_name=month_index[i])
+  sheet_list.append(df)
+
+# remove null values 
 def data_filter(data_list):
   for i in data_list:
     if pd.isnull(i):
       data_list.remove(i)
   return data_list 
 
-income = data_filter(df['Income'].tolist())
-income_val = data_filter(df.iloc[:, 1].tolist())
-expenses = data_filter(df['Expenses'].tolist())
-expenses_val = data_filter(df.iloc[:, 3].tolist())
-report = data_filter(df['Monthly report'].tolist())
-report_val = data_filter(df.iloc[:, 5].tolist())
-asset = data_filter(df['Asset'].tolist())
-asset_val = data_filter(df.iloc[:, 7].tolist())
-liability = data_filter(df['Liability'].tolist())
-liability_val = data_filter(df.iloc[:, 9].tolist())
-networth = data_filter(df['Networth'].tolist())
-# print(asset)
-# print(asset_val)
-# print(liability)
-# print(liability_val)
+# convert df into lists
+income, expenses, report, asset, liability, networth = [], [], [], [], [], []
+for i in range(len(sheet_list)):
+    income.append([data_filter(sheet_list[i]['Income'].tolist()), data_filter(sheet_list[i]['RM'].tolist())])
+    expenses.append([data_filter(sheet_list[i]['Expenses'].tolist()), data_filter(sheet_list[i]['RM.1'].tolist())])
+    report.append([data_filter(sheet_list[i]['Monthly report'].tolist()), data_filter(sheet_list[i]['RM.2'].tolist())])
+    asset.append([data_filter(sheet_list[i]['Asset'].tolist()), data_filter(sheet_list[i]['RM.3'].tolist())])
+    liability.append([data_filter(sheet_list[i]['Liability'].tolist()), data_filter(sheet_list[i]['RM.4'].tolist())])
+    networth.append(data_filter(sheet_list[i]['Networth'].tolist()))
+
+print(income)
+print(expenses)
+print(report)
+print(asset)
+print(liability)
+print(networth)
 
 # Monthly report tab
 ttk.Label(dashboard_tab, text="Monthly report").place(x = 400, y = 10)
@@ -136,7 +120,7 @@ db_line = FigureCanvasTkAgg(line_fig, dashboard_tab)
 db_line.get_tk_widget().pack()
 
 # income figure
-income_fig = Figure(figsize=(3,3), dpi=100)
+income_fig = Figure(figsize=(3, 3), dpi=100)
 income_ax = income_fig.add_subplot(111)
 income_ax.pie(income_val, radius=1, labels=income, labeldistance=True, autopct=make_autopct(income_val))
 # ax.legend(bbox_to_anchor=(0.5, 0.5), loc='lower left')
