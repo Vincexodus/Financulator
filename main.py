@@ -1,10 +1,13 @@
+from cProfile import label
+from shelve import DbfilenameShelf
 from tkinter import *
 from tkinter import ttk
+from turtle import color
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 from datetime import date
-import numpy as np
+from PIL import ImageTk, Image
 
 # gui window
 root = Tk()
@@ -74,8 +77,8 @@ for month in month_index:
     month_networth = networth[month_index.index(month)]
 
 # Monthly report label 
-ttk.Label(dashboard_tab, text="Monthly report").place(x = 400, y = 10)
-y_pos = 10
+ttk.Label(dashboard_tab, text="Monthly report", font= ('Arial', 15)).place(x = 40, y = 10)
+y_pos = 60
 for i in range(len(month_report[0])):
   ttk.Label(dashboard_tab, text=month_report[0][i] + "\t" + str(month_report[1][i])).place(x = 40, y = y_pos)
   y_pos += 50
@@ -111,35 +114,50 @@ for i in range(len(month_expenses[0])):
   ttk.Label(expenses_tab, text=str(month_expenses[0][i]) + "\t" + str(month_expenses[1][i])).place(x = 40, y = y_pos)
   y_pos += 50
 
-# dashboard figure
-db_fig = Figure(figsize=(10,10), dpi=100)
-report_ax = db_fig.add_subplot(221)
-report_ax.bar(range(len(month_report[0])), month_report[1], align='edge', width=1.0)
-report_bar = FigureCanvasTkAgg(db_fig, dashboard_tab)
-report_bar.get_tk_widget().pack()
+# ------------------------------------- dashboard -------------------------------------
 
-# dashboard networth line graph
-# networth_fig = Figure(figsize=(5,5), dpi=100)
-networth_ax = db_fig.add_subplot(222)
-networth_ax.plot(month_index[:-1], [i[0] for i in networth], color= 'orange', label= 'Networth')
-networth_ax.legend(loc = 'upper left')
-# db_line = FigureCanvasTkAgg(db_fig, dashboard_tab)
-# db_line.get_tk_widget().pack()
+def fig_init(width, height, dpi):
+  fig = Figure(figsize=(width, height), dpi=dpi)
+  ax = fig.add_subplot(111)
+  return fig, ax
 
-# dashboard report line graph
-# report_fig = Figure(figsize=(5,5), dpi=100)
-report_ax = db_fig.add_subplot(224)
-report_color = ['green', 'red', 'yellow', 'blue']
+def save_display(fig, img_name, img_width, img_height):
+  fig.savefig('images/' + img_name, transparent=True)
+  img = Image.open('images/' + img_name)
+  img = img.resize((img_width, img_height), Image.ANTIALIAS)
+  return ImageTk.PhotoImage(img)
 
-for j in range(len(month_report[0])):
-  report_ax.plot(month_index[:-1], [i[1][j] for i in report], color= report_color[j] , label=month_report[0][j])
-report_ax.legend(loc = 'upper left')
-# db_line = FigureCanvasTkAgg(db_fig, dashboard_tab)
-# db_line.get_tk_widget().pack()
+# summary bar chart 
+report_ax = fig_init(5, 5, 100)
+report_ax[1].bar(range(len(month_report[0])), month_report[1], align='edge', width=1.0, color=['red', 'blue', 'yellow', 'green'])
+report_ax[1].legend(loc = 'upper left')
+report_ax[1].set_xlabel('Type')
+report_ax[1].set_ylabel('Amount')
+summary_bar_img = save_display(report_ax[0], "summary_bar.png", 350, 350)
+ttk.Label(dashboard_tab, image = summary_bar_img).place(x = 350, y = 0)
+
+# networth line graph 
+networth_ax = fig_init(5, 5, 100)
+networth_ax[1].plot(month_index[:-1], [i[0] for i in networth], color= 'orange')
+networth_line_img = save_display(networth_ax[0], "networth_line.png", 200, 200)
+ttk.Label(dashboard_tab, image = networth_line_img).place(x = 150, y = 500)
+
+# # dashboard report line graph
+# report_ax = db_fig.add_subplot(224)
+# report_color = ['green', 'red', 'yellow', 'blue']
+
+# for j in range(len(month_report[0])):
+#   report_ax.plot(month_index[:-1], [i[1][j] for i in report], color= report_color[j] , label=month_report[0][j])
+# report_ax.legend(loc = 'upper left')
+
+# report_fig = FigureCanvasTkAgg(db_fig, dashboard_tab)
+# report_fig.get_tk_widget().pack()
 
 # line_ax.title('Net Worth')
 # line_ax.xlabel('Month')
 # line_ax.plt.ylabel('RM')
+
+# ------------------------------------- income -------------------------------------
 
 # income pie chart
 income_fig = Figure(figsize=(3, 3), dpi=100)
